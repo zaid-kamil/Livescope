@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "367562118835",
+    "firebase_url": "https://android-ca360.firebaseio.com",
+    "project_id": "android-ca360",
+    "storage_bucket": "android-ca360.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:367562118835:android:4e0b02a1b840ae1b",
+        "android_client_info": {
+          "package_name": "trainedge.kaleidoscope"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "367562118835-mmt1f5h2ka46ugroh1d6nh2n8o45fgs9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "trainedge.kaleidoscope",
+            "certificate_hash": "41cb8e8a0757c962f58f3d4aed42fe725597afe6"
+          }
+        },
+        {
+          "client_id": "367562118835-k57buulmlhv58f1okqqnfounpp0atah1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmeHscpPLpzOPMdQsCHSPyf-7CtAKZmkA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "367562118835-k57buulmlhv58f1okqqnfounpp0atah1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

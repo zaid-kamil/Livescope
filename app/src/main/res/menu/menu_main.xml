@@ -13,6 +13,6 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/logOut"
-        android:orderInCategory="102"
+        android:orderInCategory="103"
         android:title="Log Out" />
 </menu>

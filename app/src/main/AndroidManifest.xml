@@ -85,6 +85,8 @@
                 android:value="trainedge.kaleidoscope.MainActivity" />
         </activity>
         <activity
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="portrait"
             android:name=".PlayerActivity"
             android:label="@string/title_activity_player"
             android:parentActivityName=".MainActivity"

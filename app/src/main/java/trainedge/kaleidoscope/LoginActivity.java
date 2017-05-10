@@ -7,9 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -40,15 +37,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import static android.R.string.ok;
-
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
-    private Button googleSignIn;
     public static final int RC_SIGN_IN = 7238;
-    private GoogleApiClient mGoogleApiClient;
     public static final String TAG = "LoginActivity";
+    private Button googleSignIn;
+    private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private LoginButton loginButton;
@@ -72,7 +67,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         etPassword = (EditText) findViewById(R.id.password);
         appSignIn = (Button) findViewById(R.id.appSignIn);
         rememberPassword = (CheckBox) findViewById(R.id.rememberPassword);
-        btnReset =(Button)findViewById(R.id.btnReset);
+        btnReset = (Button) findViewById(R.id.btnReset);
         loginPref = getSharedPreferences("loginPrefs", MODE_PRIVATE);
 
 
@@ -110,7 +105,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         };
 
 
-
         saveLogin = loginPref.getBoolean("rememberPassword", false);
         if (saveLogin) {
             etEmail.setText(loginPref.getString("username", ""));
@@ -125,7 +119,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         appSignUp.setOnClickListener(this);
         btnReset.setOnClickListener(this);
         googleSignIn.setOnClickListener(this);
-
 
 
         //facebook step
@@ -155,14 +148,23 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     private void appSignIn() {
-        if (etEmail.getText().toString().length() == 0)
+        String email = etEmail.getText().toString();
+        if (email.length() == 0)
             etEmail.setError("Email you entered is invalid!!");
-        else if (etPassword.getText().toString().length() == 0)
-            etPassword.setError("Password you entered is invalid!!");
         else {
-            Intent i = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(i);
-            finish();
+            String password = etPassword.getText().toString();
+            if (password.length() == 0)
+                etPassword.setError("Password you entered is invalid!!");
+            else {
+                mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(LoginActivity.this, "email password invalid", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -177,8 +179,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         finish();
     }
 
-    private void resetPassword(){
-        Intent i=new Intent(LoginActivity.this,Reset_Password.class);
+    private void resetPassword() {
+        Intent i = new Intent(LoginActivity.this, Reset_Password.class);
         startActivity(i);
     }
 
@@ -199,10 +201,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 loginPrefEditor.clear();
                 loginPrefEditor.apply();
             }
-            /*Intent i = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(i);
-            LoginActivity.this.finish();
-        */}
+
+        }
 
     }
 

@@ -29,7 +29,7 @@ public class Reset_Password extends AppCompatActivity implements View.OnClickLis
         etEmail = (EditText) findViewById(R.id.etEmail);
         btnReset = (Button) findViewById(R.id.btnReset);
         btnCancel = (Button) findViewById(R.id.btnCancel);
-
+        btnCancel.setOnClickListener(this);
         btnReset.setOnClickListener(this);
     }
 

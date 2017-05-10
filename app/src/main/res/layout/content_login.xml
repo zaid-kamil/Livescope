@@ -62,17 +62,18 @@
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="67dp"
         android:text="Sign In"
+        android:textAllCaps="false"
         android:textColor="#010101"
         android:textSize="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/textView5"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintLeft_toLeftOf="@+id/password"
         app:layout_constraintRight_toRightOf="@+id/password"
-        app:layout_constraintHorizontal_bias="0.501"
-        tools:layout_constraintRight_creator="1"
         tools:layout_constraintBottom_creator="1"
-        app:layout_constraintBottom_toTopOf="@+id/textView5"
         tools:layout_constraintLeft_creator="1"
-        android:layout_marginBottom="67dp" />
+        tools:layout_constraintRight_creator="1" />
 
     <CheckBox
         android:id="@+id/rememberPassword"
@@ -111,14 +112,15 @@
         android:id="@+id/btnReset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
         android:text="Reset your Password Here"
+        android:textAllCaps="false"
         android:textSize="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintLeft_toLeftOf="@+id/textView5"
         app:layout_constraintRight_toRightOf="@+id/textView5"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
-        android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@+id/textView5"
         app:layout_constraintVertical_bias="0.037" />
 
@@ -141,15 +143,16 @@
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="11dp"
         android:text="Sign Up"
+        android:textAllCaps="false"
         android:textColor="#010101"
         android:textSize="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/googleSignIn"
         app:layout_constraintLeft_toLeftOf="@+id/textView"
         app:layout_constraintRight_toRightOf="@+id/textView"
-        android:layout_marginBottom="11dp"
-        app:layout_constraintBottom_toTopOf="@+id/googleSignIn"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintLeft_creator="1" />
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1" />
 
     <Button
         android:id="@+id/googleSignIn"

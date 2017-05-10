@@ -1,38 +1,59 @@
 package trainedge.kaleidoscope;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.hardware.Camera;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import com.facebook.login.LoginManager;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnPausedListener;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import trainedge.kaleidoscope.adapters.VideoAdapter;
+import trainedge.kaleidoscope.models.VideoModel;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    static final int REQUEST_VIDEO_CAPTURE = 1;
     private FloatingActionButton fbVideo;
     private StorageReference mStorageRef;
+    private CardView cvUploadCard;
+    private TextView tvProgress;
+    private TextView tvSizeInBytes;
+    private TextView tvRemainingSize;
+    private ProgressBar pbProgress;
+    private TextView tvBroadcast;
+    private RecyclerView rvBroadcastList;
+    private List<VideoModel> videoList;
+    private VideoAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +65,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fbVideo.setOnClickListener(this);
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
+        cvUploadCard = (CardView) findViewById(R.id.tvUploadCard);
+        tvProgress = (TextView) findViewById(R.id.tvProgress);
+        tvSizeInBytes = (TextView) findViewById(R.id.tvSizeInBytes);
+        tvRemainingSize = (TextView) findViewById(R.id.tvRemainingSize);
+        pbProgress = (ProgressBar) findViewById(R.id.pbProgress);
+        tvBroadcast = (TextView) findViewById(R.id.tvBroadcast);
+        rvBroadcastList = (RecyclerView) findViewById(R.id.rvBroadcastList);
 
+        cvUploadCard.setVisibility(View.GONE);
+
+        setUpRecyclerView();
+    }
+
+    private void setUpRecyclerView() {
+        rvBroadcastList.setLayoutManager(new LinearLayoutManager(this));
+        videoList = new ArrayList<>();
+        adapter = new VideoAdapter(this, videoList);
+        rvBroadcastList.setAdapter(adapter);
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference broadcastsRef = FirebaseDatabase.getInstance().getReference("broadcasts").child(uid);
+        /*final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage("loading");*/
+        //dialog.show();
+        broadcastsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int pos = 0;
+                videoList.clear();
+                if (dataSnapshot.hasChildren()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        videoList.add(new VideoModel(snapshot));
+                        adapter.notifyItemInserted(pos);
+                        pos++;
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -62,57 +125,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.about) {
-            Intent i = new Intent(MainActivity.this, About.class);
-            startActivity(i);
-        } else if (id == R.id.settings) {
+        if (id == R.id.settings) {
             Intent i = new Intent(MainActivity.this, Settings.class);
             startActivity(i);
-        } else if (id == R.id.logOut) {
-            showAlert();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void showAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setIcon(R.drawable.ic_warning_black_24dp);
-        builder.setTitle("Warning");
-        builder.setMessage("   Sure to Log Out??");
-        builder.setPositiveButton("LogOut", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user != null) {
-                    FirebaseAuth.getInstance().signOut();
-                            /*try{
-                                LoginManager.getInstance().logOut();
-                            }
-                            catch ( Exception Ignore){
-                            }*/
-                    Intent i = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivity(i);
-                    Toast.makeText(MainActivity.this, "LogOut Successful", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(MainActivity.this, "LogOut Cancelled", Toast.LENGTH_LONG).show();
-            }
-        });
-        builder.setCancelable(false);
-        builder.create().show();
-    }
-
     @Override
     public void onClick(View v) {
-
+        switch (v.getId()) {
+            case R.id.fbVideo:
+                dispatchTakeVideoIntent();
+                break;
+        }
     }
-
-    static final int REQUEST_VIDEO_CAPTURE = 1;
 
     private void dispatchTakeVideoIntent() {
         Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
@@ -120,8 +148,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
         }
     }
-
-    ;
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
@@ -131,9 +157,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void uploadToDatabase(Uri videoUri) {
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final String name = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        final String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
         StorageReference riversRef = mStorageRef.child(uid).child("upload");
-
+        cvUploadCard.setVisibility(View.VISIBLE);
         riversRef.putFile(videoUri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -141,6 +169,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         // Get a URL to the uploaded content
                         @SuppressWarnings("VisibleForTests")
                         Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                        new AsyncTask<String, Void, Void>() {
+
+                            @Override
+                            protected Void doInBackground(String... params) {
+                                String url = params[0];
+                                String uid = params[1];
+                                String user = params[2];
+                                DatabaseReference broadcastsRef = FirebaseDatabase.getInstance().getReference("broadcasts").child(uid);
+                                HashMap<String, Object> broadData = new HashMap<String, Object>();
+                                broadData.put(VideoModel.UPLOADER, user);
+                                broadData.put(VideoModel.VIDEO_URL, url);
+                                broadData.put(VideoModel.VIEWS, 1);
+                                broadData.put(VideoModel.BROADCAST_STATUS, true);
+                                broadData.put(VideoModel.NAME, "user" + System.currentTimeMillis());
+                                broadcastsRef.push().setValue(broadData);
+                                return null;
+                            }
+                        }.execute(downloadUrl.toString(), uid, name == null ? email : name);
+
+                        cvUploadCard.setVisibility(View.GONE);
+                        Snackbar.make(fbVideo, "Uploaded", Snackbar.LENGTH_INDEFINITE);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -148,12 +197,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
                         // ...
+
+                        cvUploadCard.setVisibility(View.GONE);
+                        Snackbar.make(fbVideo, "Sorry your video could not be uploaded " + exception.getMessage(), Snackbar.LENGTH_INDEFINITE);
                     }
                 })
                 .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-
+                        @SuppressWarnings("VisibleForTests")
+                        long totalByteCount = taskSnapshot.getTotalByteCount();
+                        @SuppressWarnings("VisibleForTests")
+                        long bytesTransferred = taskSnapshot.getBytesTransferred();
+                        tvSizeInBytes.setText("total size : " + totalByteCount);
+                        tvRemainingSize.setText("uploaded : " + bytesTransferred);
                     }
                 })
                 .addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {

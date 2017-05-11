@@ -7,4 +7,10 @@
         android:orderInCategory="101"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/users"
+
+        android:icon="@drawable/ic_speaker_light"
+        android:title="User"
+        app:showAsAction="always" />
 </menu>

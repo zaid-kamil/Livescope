@@ -156,7 +156,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             if (password.length() == 0)
                 etPassword.setError("Password you entered is invalid!!");
             else {
-                mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isSuccessful()) {

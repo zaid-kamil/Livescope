@@ -26,6 +26,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.HashMap;
 
 public class SignUpPage extends AppCompatActivity implements View.OnClickListener {
+    public static final String FIRST_NAME = "FirstName";
+    public static final String LAST_NAME = "LastName";
+    public static final String EMAIL = "Email";
+    public static final String DATE_OF_BIRTH = "DateOfBirth";
     private EditText etName;
     private EditText etSurname;
     private EditText etEmail;
@@ -151,11 +155,11 @@ public class SignUpPage extends AppCompatActivity implements View.OnClickListene
                                     , Toast.LENGTH_SHORT).show();
                         }else{
                             HashMap<String, String> map = new HashMap<>();
-                            map.put("FirstName", name);
-                            map.put("LastName", surname);
-                            map.put("Email", email);
-                            map.put("DateOfBirth", date);
-                            signUpRef.push().setValue(map, new DatabaseReference.CompletionListener() {
+                            map.put(FIRST_NAME, name);
+                            map.put(LAST_NAME, surname);
+                            map.put(EMAIL, email);
+                            map.put(DATE_OF_BIRTH, date);
+                            signUpRef.child(task.getResult().getUser().getUid()).setValue(map, new DatabaseReference.CompletionListener() {
                                 @Override
                                 public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                                     etName.setText("");

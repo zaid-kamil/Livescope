@@ -43,6 +43,7 @@ import trainedge.kaleidoscope.models.VideoModel;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     static final int REQUEST_VIDEO_CAPTURE = 1;
+    public static final String BROADCASTS = "broadcasts";
     private FloatingActionButton fbVideo;
     private StorageReference mStorageRef;
     private CardView cvUploadCard;
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cvUploadCard.setVisibility(View.GONE);
 
         setUpRecyclerView();
+        startService(new Intent(this,MyService.class));
     }
 
     private void setUpRecyclerView() {
@@ -84,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adapter = new VideoAdapter(this, videoList);
         rvBroadcastList.setAdapter(adapter);
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference broadcastsRef = FirebaseDatabase.getInstance().getReference("broadcasts").child(uid);
+        DatabaseReference broadcastsRef = FirebaseDatabase.getInstance().getReference(BROADCASTS).child(uid);
         /*final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage("loading");*/
         //dialog.show();
@@ -127,6 +129,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //noinspection SimplifiableIfStatement
         if (id == R.id.settings) {
             Intent i = new Intent(MainActivity.this, Settings.class);
+            startActivity(i);
+        }
+        if (id == R.id.users) {
+            Intent i = new Intent(MainActivity.this, UsersActivity.class);
             startActivity(i);
         }
 
